@@ -8,7 +8,7 @@ pip install service
 https://pypi.python.org/pypi/schedule
 """
 
-import logging
+import logging, schedule
 from logging.handlers import RotatingFileHandler
 import time
 
@@ -23,12 +23,16 @@ class MyService(Service):
         self.logger.addHandler(rfh)
         self.logger.setLevel(logging.INFO)
 
+    def main(self):
+        self.logger.info("I'm started by scheduler...")
+
     def run(self):
         self.logger.info('#'*80)
         self.logger.info('starting')
+        schedule.every(1).minutes.do(self.main)
         while not self.got_sigterm():
-            self.logger.info("I'm working...")
-            time.sleep(5)
+            schedule.run_pending()
+            time.sleep(1)
         self.logger.info('stoped')
 
 if __name__ == '__main__':
